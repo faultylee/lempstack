@@ -2,6 +2,16 @@
 function pause(){
    read -p "$*"
 }
+
+function check_root() {
+	if [ ! "`whoami`" = "root" ]
+	then
+	    echo "Root previlege required to run this script. Rerun as root."
+	    exit 1
+	fi
+}
+check_root
+
 if [ `cat /etc/issue|awk 'NR==1 {print $1}'` != "Ubuntu" ];then
 cat > /etc/apt/sources.list.d/dotdeb.list <<END
 deb http://packages.dotdeb.org stable all
@@ -19,7 +29,7 @@ apt-get install nginx mysql-server php5 php5-mysql sqlite3 php5-sqlite php5-curl
 cat > /etc/php5/conf.d/apc.ini <<END
 extension=apc.so
 apc.enabled=1
-apc.shm_size=30
+apc.shm_size=30M
 END
 
 service mysql stop
@@ -216,6 +226,3 @@ echo Running mysql_secure_installation. Use root password if set during install 
 pause 'Press [Enter] key to continue after reading the above line ...'
 mysql_secure_installation
 exit
-
-
-
